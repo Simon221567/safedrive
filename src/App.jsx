@@ -988,26 +988,6 @@ User: "how to reduce hard braking?" → {"mode":"card","title":"Smooth Braking",
     }
     setChatLoading(false);
   };
-      } else {
-        // No JSON found — treat as plain text reply
-        if (reply) {
-          setMessages((p) => [...p, { role: "assistant", text: reply }]);
-        } else if (fallback) {
-          setMessages((p) => [...p, { role: "assistant", card: fallback }]);
-        } else {
-          setMessages((p) => [...p, { role: "assistant", text: "Sorry, try again." }]);
-        }
-      }
-    } catch (err) {
-      // API unreachable
-      if (fallback) {
-        setMessages((p) => [...p, { role: "assistant", card: fallback }]);
-      } else {
-        setMessages((p) => [...p, { role: "assistant", text: "I'm having trouble connecting. Please try again." }]);
-      }
-    }
-    setChatLoading(false);
-  };
 
   if (mode === "chat") {
     const quickQuestions = [
@@ -1971,3 +1951,4 @@ export default function App() {
     </div>
   );
 }
+ 
