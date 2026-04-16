@@ -906,11 +906,6 @@ function DrivePage({ t, lang }) {
     setChatInput("");
     setChatLoading(true);
 
-    // Only use fallback card if the question is clearly about driving techniques
-    const isDrivingTechniqueQuestion = /brak|距|gap|speed|速|turn|彎|弯|score|分|leaderboard|rank|榜|tuen mun|屯|scan|ahead|follow|跟車|跟车|距|safety|安全|how to|怎樣|怎样|怎么|点样/i.test(msg);
-
-    const fallback = isDrivingTechniqueQuestion ? pickFallbackCard(msg) : null;
-
     // Build conversation history for context
     const history = messages.filter(m => m.role === "user" || (m.role === "assistant" && m.text)).slice(-6).map(m => ({
       role: m.role,
@@ -926,68 +921,73 @@ function DrivePage({ t, lang }) {
           max_tokens: 600,
           system: `You are a friendly AI driving coach for Hong Kong minibus driver Yeung Tai Man. Current safety score: 82/100, lost 80 points this week (mainly from hard braking and following too close). Routes: Tuen Mun Road, Castle Peak Road, Sham Tseng.
 
-RESPONSE MODE — decide based on the user's message:
+You MUST respond with ONLY a JSON object (no markdown fences, no extra text, nothing else).
 
-**MODE A: VISUAL CARD** — only when the user asks for specific driving technique advice (how to brake, how to follow safely, how to improve score, route tips, etc.)
-Return ONLY a JSON object, no other text:
-{
-  "mode": "card",
-  "title": "Short 2-4 word title",
-  "icon": "one relevant emoji",
-  "color": "orange" | "red" | "green" | "blue",
-  "visual": "distance" | "speed" | "brake" | "turn" | "score" | "lane" | "scan",
-  "tips": ["Tip 1 max 8 words", "Tip 2 max 8 words", "Tip 3 max 8 words"],
-  "encouragement": "One short sentence under 10 words"
-}
+Decide mode based on THIS user message:
 
-**MODE B: PLAIN TEXT** — for everything else (greetings, compliments like "you're great", casual chat, questions about rewards/app features, clarifications, thanks, emotional expression)
-Return ONLY a JSON object, no other text:
-{
-  "mode": "text",
-  "text": "Your natural, warm, conversational response in 1-3 short sentences. Match the user's language."
-}
+MODE A - VISUAL CARD: ONLY when the user EXPLICITLY asks about a driving technique (how to brake, how to follow, route tips, how to improve score). If in doubt, use MODE B.
+{"mode":"card","title":"2-4 words","icon":"emoji","color":"orange|red|green|blue","visual":"distance|speed|brake|turn|score|lane|scan","tips":["tip1 ≤8 words","tip2 ≤8 words","tip3 ≤8 words"],"encouragement":"≤10 words"}
 
-Rules:
-- ALWAYS return valid JSON only, no markdown fences, no extra text
-- Match the user's language (English, 繁體中文, or 简体中文)
-- For MODE B: be warm and natural like a human coach, not robotic. Compliments deserve a gracious reply. Questions about app features deserve helpful info.
-- For MODE A tips: ≤8 words each, action-focused, 2-3 tips max
+MODE B - PLAIN TEXT: For EVERYTHING else — greetings ("hi","hello","bye"), thanks ("thank you","thanks","good thanks"), compliments ("you are great"), chitchat, questions about app features, rewards, leaderboard info, unclear messages.
+{"mode":"text","text":"Your warm natural reply in 1-2 short sentences."}
+
+CRITICAL RULES:
+- "hi" / "hello" / "bye" / "thanks" / "good thanks" / "ok" / compliments → ALWAYS MODE B
+- Only use MODE A if user clearly asks "how to..." about driving
+- Match user's language (English / 繁體中文 / 简体中文)
+- Return ONLY the raw JSON object, no code fences, no explanation
 
 Examples:
-User: "How to reduce hard braking?" → MODE A (driving technique)
-User: "You are a great coach!" → MODE B: {"mode":"text","text":"Thank you! 😊 I'm here whenever you need driving tips. Keep up the safe driving!"}
-User: "What rewards can I redeem?" → MODE B: {"mode":"text","text":"Check the Rewards tab! You can exchange points for fuel vouchers, meal coupons, or phone top-ups. 🎁"}
-User: "Hi" → MODE B: {"mode":"text","text":"Hi! How can I help with your driving today?"}`,
+User: "hi" → {"mode":"text","text":"Hi! How can I help with your driving today?"}
+User: "bye" → {"mode":"text","text":"Bye! Drive safe out there! 👋"}
+User: "good thanks!" → {"mode":"text","text":"You're welcome! Anytime you need tips, I'm here. 😊"}
+User: "how to reduce hard braking?" → {"mode":"card","title":"Smooth Braking","icon":"🛑","color":"red","visual":"brake","tips":["Scan 200m ahead","Lift gas before corners","Keep 3-second gap"],"encouragement":"Small changes, big score boost!"}`,
           messages: [...history, { role: "user", content: msg }],
         }),
       });
       const data = await res.json();
+
+      // Check for API error
+      if (data.error) {
+        setMessages((p) => [...p, { role: "assistant", text: "AI error: " + (data.error.message || data.error) }]);
+        setChatLoading(false);
+        return;
+      }
+
       const reply = (data.content && data.content.map((c) => c.text || "").join("")) || "";
-      const jsonMatch = reply.match(/\{[\s\S]*\}/);
+      // Try to extract JSON (handle possible code fences)
+      let cleanReply = reply.trim();
+      cleanReply = cleanReply.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+      const jsonMatch = cleanReply.match(/\{[\s\S]*\}/);
+
       if (jsonMatch) {
         try {
           const parsed = JSON.parse(jsonMatch[0]);
           if (parsed.mode === "text" && parsed.text) {
             setMessages((p) => [...p, { role: "assistant", text: parsed.text }]);
-          } else if (parsed.mode === "card" || parsed.tips) {
+          } else if (parsed.mode === "card" && parsed.tips) {
             setMessages((p) => [...p, { role: "assistant", card: parsed }]);
           } else if (parsed.text) {
             setMessages((p) => [...p, { role: "assistant", text: parsed.text }]);
+          } else if (parsed.tips) {
+            setMessages((p) => [...p, { role: "assistant", card: parsed }]);
           } else {
-            // Unknown structure, fallback
-            if (fallback) {
-              setMessages((p) => [...p, { role: "assistant", card: fallback }]);
-            } else {
-              setMessages((p) => [...p, { role: "assistant", text: reply }]);
-            }
+            // Unexpected structure - just show raw reply as text
+            setMessages((p) => [...p, { role: "assistant", text: reply }]);
           }
         } catch {
-          if (fallback) {
-            setMessages((p) => [...p, { role: "assistant", card: fallback }]);
-          } else {
-            setMessages((p) => [...p, { role: "assistant", text: reply || "Sorry, try again." }]);
-          }
+          // Parse failed - show raw reply as text
+          setMessages((p) => [...p, { role: "assistant", text: reply }]);
         }
+      } else {
+        // No JSON - show as plain text
+        setMessages((p) => [...p, { role: "assistant", text: reply || "Sorry, I didn't get that. Try again." }]);
+      }
+    } catch (err) {
+      setMessages((p) => [...p, { role: "assistant", text: "Connection error. Please check your network and try again." }]);
+    }
+    setChatLoading(false);
+  };
       } else {
         // No JSON found — treat as plain text reply
         if (reply) {
