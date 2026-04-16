@@ -922,7 +922,7 @@ function DrivePage({ t, lang }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-5",
           max_tokens: 600,
           system: `You are a friendly AI driving coach for Hong Kong minibus driver Yeung Tai Man. Current safety score: 82/100, lost 80 points this week (mainly from hard braking and following too close). Routes: Tuen Mun Road, Castle Peak Road, Sham Tseng.
 
