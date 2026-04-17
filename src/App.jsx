@@ -27,7 +27,7 @@ const TREND_DATA = [
 const DRIVERS_WEEKLY = [
   { id: 1, name: "Chan Wing", ini: "CW", pts: 488 },
   { id: 2, name: "Lee Ka Ming", ini: "LK", pts: 475 },
-  { id: 3, name: "Wong Ho", ini: "WH", pts: 461 },
+  { id: 3, name: "Wong Ho", ini: "WH", pts: 436 },
   { id: 4, name: "You", ini: "YT", pts: 420, me: true },
   { id: 5, name: "Tsang Ming", ini: "TM", pts: 398 },
   { id: 6, name: "Lam Siu", ini: "LS", pts: 372 },
@@ -43,7 +43,7 @@ const DRIVERS_MONTHLY = [
   { id: 1, name: "Chan Wing", ini: "CW", pts: 1885 },
   { id: 3, name: "Wong Ho", ini: "WH", pts: 1840 },
   { id: 5, name: "Tsang Ming", ini: "TM", pts: 1795 },
-  { id: 6, name: "Lam Siu", ini: "LS", pts: 1740 },
+  { id: 6, name: "Lam Siu", ini: "LS", pts: 1690 },
   { id: 4, name: "You", ini: "YT", pts: 1680, me: true },
   { id: 7, name: "Ng Hoi", ini: "NH", pts: 1620 },
   { id: 8, name: "Cheung Wai", ini: "CG", pts: 1540 },
@@ -53,6 +53,33 @@ const DRIVERS_MONTHLY = [
 
 // Legacy compat
 const DRIVERS = DRIVERS_WEEKLY;
+
+// After trip completion: user climbs to #2 weekly, #5 monthly
+const DRIVERS_WEEKLY_POST = [
+  { id: 1, name: "Chan Wing", ini: "CW", pts: 488 },
+  { id: 4, name: "You", ini: "YT", pts: 482, me: true },
+  { id: 2, name: "Lee Ka Ming", ini: "LK", pts: 475 },
+  { id: 3, name: "Wong Ho", ini: "WH", pts: 436 },
+  { id: 5, name: "Tsang Ming", ini: "TM", pts: 398 },
+  { id: 6, name: "Lam Siu", ini: "LS", pts: 372 },
+  { id: 7, name: "Ng Hoi", ini: "NH", pts: 355 },
+  { id: 8, name: "Cheung Wai", ini: "CG", pts: 340 },
+  { id: 9, name: "Fong Yip", ini: "FY", pts: 318 },
+  { id: 10, name: "Yau Shing", ini: "YS", pts: 295 },
+];
+
+const DRIVERS_MONTHLY_POST = [
+  { id: 2, name: "Lee Ka Ming", ini: "LK", pts: 1920 },
+  { id: 1, name: "Chan Wing", ini: "CW", pts: 1885 },
+  { id: 3, name: "Wong Ho", ini: "WH", pts: 1840 },
+  { id: 5, name: "Tsang Ming", ini: "TM", pts: 1795 },
+  { id: 4, name: "You", ini: "YT", pts: 1742, me: true },
+  { id: 6, name: "Lam Siu", ini: "LS", pts: 1690 },
+  { id: 7, name: "Ng Hoi", ini: "NH", pts: 1620 },
+  { id: 8, name: "Cheung Wai", ini: "CG", pts: 1540 },
+  { id: 9, name: "Fong Yip", ini: "FY", pts: 1480 },
+  { id: 10, name: "Yau Shing", ini: "YS", pts: 1390 },
+];
 
 const METRICS = [
   { name: "Hard braking", val: 75, color: ORANGE },
@@ -83,15 +110,23 @@ const BADGES = [
 ];
 
 const DRIVE_EVENTS = [
-  { type: "bad", text: "Hard braking detected", pts: -30, time: 3 },
-  { type: "warn", text: "Following distance too close", pts: -20, time: 8 },
-  { type: "good", text: "Smooth acceleration", pts: 0, time: 13 },
-  { type: "near", text: "Near miss: 49 km/h in 50 zone", pts: 0, time: 18 },
-  { type: "bad", text: "Speeding: 58 in 50 zone", pts: -25, time: 24 },
-  { type: "good", text: "Safe lane change", pts: 0, time: 29 },
-  { type: "near", text: "Near miss: braking 0.38g (limit 0.4g)", pts: 0, time: 35 },
-  { type: "warn", text: "Sharp turn detected", pts: -15, time: 40 },
-  { type: "good", text: "Maintained safe distance", pts: 0, time: 46 },
+  { type: "good", text: "Smooth departure from stop", pts: +10, time: 3 },
+  { type: "good", text: "Safe speed maintained", pts: +10, time: 7 },
+  { type: "bad", text: "Hard braking detected", pts: -25, time: 12 },
+  { type: "good", text: "Smooth acceleration", pts: +15, time: 17 },
+  { type: "good", text: "Safe following distance", pts: +10, time: 21 },
+  { type: "warn", text: "Following distance too close", pts: -15, time: 26 },
+  { type: "good", text: "Safe lane change", pts: +10, time: 30 },
+  { type: "good", text: "Proper signaling", pts: +5, time: 34 },
+  { type: "near", text: "Near miss: 49 km/h in 50 zone", pts: 0, time: 38 },
+  { type: "good", text: "Smooth cornering", pts: +10, time: 42 },
+  { type: "bad", text: "Speeding: 55 in 50 zone", pts: -20, time: 47 },
+  { type: "good", text: "Maintained safe distance", pts: +15, time: 51 },
+  { type: "good", text: "Safe stop at traffic light", pts: +10, time: 55 },
+  { type: "good", text: "Gentle braking at junction", pts: +10, time: 59 },
+  { type: "warn", text: "Sharp turn detected", pts: -10, time: 63 },
+  { type: "good", text: "Smooth highway merge", pts: +15, time: 67 },
+  { type: "good", text: "Consistent speed on straight", pts: +10, time: 72 },
 ];
 
 const LANGS = { en: "English", zh_hant: "繁體中文", zh_hans: "简体中文" };
@@ -358,12 +393,14 @@ function SafetyScoreCard({ t }) {
 
 // ===== Google Maps style map (idle and live) =====
 function GoogleStyleMap({ progress = null, height = 200 }) {
-  // Shared map layout. If progress is provided, show animated car. Otherwise static route preview.
+  // More realistic winding route with curves (Tsuen Wan → Sham Tseng → Tuen Mun)
   const waypoints = [
-    { x: 52, y: 260 }, { x: 88, y: 235 }, { x: 112, y: 210 },
-    { x: 138, y: 178 }, { x: 168, y: 152 }, { x: 192, y: 132 },
-    { x: 218, y: 110 }, { x: 248, y: 88 }, { x: 280, y: 70 },
-    { x: 314, y: 54 },
+    { x: 48, y: 268 }, { x: 65, y: 250 }, { x: 85, y: 228 },
+    { x: 110, y: 215 }, { x: 130, y: 230 }, { x: 148, y: 218 },
+    { x: 165, y: 195 }, { x: 175, y: 168 }, { x: 190, y: 148 },
+    { x: 210, y: 135 }, { x: 235, y: 125 }, { x: 250, y: 108 },
+    { x: 260, y: 88 }, { x: 275, y: 72 }, { x: 300, y: 60 },
+    { x: 322, y: 52 },
   ];
   let carX = null, carY = null, angle = 0, pct = 0;
   if (progress !== null) {
@@ -377,8 +414,9 @@ function GoogleStyleMap({ progress = null, height = 200 }) {
     angle = Math.atan2(next.y - curr.y, next.x - curr.x) * 180 / Math.PI;
   }
 
-  const pathD = "M 52 260 Q 100 230 138 178 T 218 110 Q 260 85 314 54";
-  const totalLen = 420;
+  // Complex winding route path with multiple curves
+  const pathD = "M 48 268 C 55 255 62 245 85 228 C 100 218 115 225 130 230 C 142 234 152 222 165 195 C 172 180 178 162 190 148 C 200 138 220 130 235 125 C 248 120 255 108 260 88 C 264 76 270 68 300 60 C 310 57 318 53 322 52";
+  const totalLen = 520;
   const dashedOffset = progress !== null ? pct * totalLen : 0;
 
   return (
@@ -437,19 +475,20 @@ function GoogleStyleMap({ progress = null, height = 200 }) {
         )}
 
         {/* Start marker */}
-        <circle cx="52" cy="260" r="10" fill="#FFFFFF" stroke="#1E6CD8" strokeWidth="3" />
-        <circle cx="52" cy="260" r="4" fill="#1E6CD8" />
+        <circle cx="48" cy="268" r="10" fill="#FFFFFF" stroke="#1E6CD8" strokeWidth="3" />
+        <circle cx="48" cy="268" r="4" fill="#1E6CD8" />
 
         {/* End marker (pin) */}
-        <g transform="translate(314, 54)">
+        <g transform="translate(322, 52)">
           <path d="M 0 -20 C -8 -20 -12 -14 -12 -8 C -12 0 0 10 0 10 C 0 10 12 0 12 -8 C 12 -14 8 -20 0 -20 Z" fill="#DB4437" stroke="#fff" strokeWidth="1.5" />
           <circle cx="0" cy="-10" r="4" fill="#fff" />
         </g>
 
         {/* Place labels */}
-        <text x="68" y="275" fontSize="10" fill="#3C3C3C" fontWeight="600" fontFamily="Arial">Tsuen Wan</text>
-        <text x="265" y="40" fontSize="10" fill="#3C3C3C" fontWeight="600" fontFamily="Arial">Tuen Mun</text>
-        <text x="175" y="170" fontSize="9" fill="#8A6A1F" fontWeight="500" fontStyle="italic">Tuen Mun Rd</text>
+        <text x="60" y="283" fontSize="10" fill="#3C3C3C" fontWeight="600" fontFamily="Arial">Tsuen Wan</text>
+        <text x="273" y="40" fontSize="10" fill="#3C3C3C" fontWeight="600" fontFamily="Arial">Tuen Mun</text>
+        <text x="125" y="245" fontSize="8" fill="#3C3C3C" fontWeight="500" fontFamily="Arial">Sham Tseng</text>
+        <text x="175" y="175" fontSize="9" fill="#8A6A1F" fontWeight="500" fontStyle="italic">Tuen Mun Rd</text>
         <text x="110" y="80" fontSize="8" fill="#4A7A30" fontStyle="italic">Tai Lam Park</text>
         <text x="8" y="150" fontSize="8" fill="#2E6F8A" fontStyle="italic">Rambler Chan.</text>
 
@@ -559,7 +598,7 @@ function LoginPage({ onLogin }) {
   );
 }
 
-function HomePage({ t, showLoss }) {
+function HomePage({ t, showLoss, tripScore }) {
   return (
     <div>
       <StatusBar />
@@ -569,7 +608,7 @@ function HomePage({ t, showLoss }) {
         <div style={{ background: "linear-gradient(135deg, " + ORANGE + ", " + ORANGE2 + ")", borderRadius: 22, padding: 22, color: "#fff", position: "relative", marginBottom: 14 }}>
           <div style={{ position: "absolute", top: 16, right: 18, background: "rgba(255,255,255,0.2)", borderRadius: 12, padding: "4px 14px", fontSize: 11 }}>Week 14</div>
           <div style={{ fontSize: 13, opacity: 0.85 }}>{t.thisWeek}</div>
-          <div style={{ fontSize: 46, fontWeight: 800, margin: "4px 0", letterSpacing: -1 }}>420</div>
+          <div style={{ fontSize: 46, fontWeight: 800, margin: "4px 0", letterSpacing: -1 }}>{tripScore}</div>
           <div style={{ fontSize: 12, opacity: 0.75 }}>{t.startedWith}</div>
         </div>
 
@@ -856,10 +895,10 @@ function VisualTipCard({ card }) {
   );
 }
 
-function DrivePage({ t, lang }) {
+function DrivePage({ t, lang, onTripComplete, tripScore }) {
   const [mode, setMode] = useState("idle");
   const [events, setEvents] = useState([]);
-  const [pts, setPts] = useState(420);
+  const [pts, setPts] = useState(tripScore);
   const [speed, setSpeed] = useState(0);
   const [elapsed, setElapsed] = useState(0);
   const [messages, setMessages] = useState([]);
@@ -887,7 +926,7 @@ function DrivePage({ t, lang }) {
           const ev = DRIVE_EVENTS.find((e) => e.time === next);
           if (ev) {
             setEvents((p) => [ev, ...p]);
-            if (ev.pts < 0) setPts((p) => p + ev.pts);
+            if (ev.pts !== 0) setPts((p) => p + ev.pts);
           }
           return next;
         });
@@ -907,10 +946,13 @@ function DrivePage({ t, lang }) {
     setChatLoading(true);
 
     // Build conversation history for context
-    const history = messages.filter(m => m.role === "user" || (m.role === "assistant" && m.text)).slice(-6).map(m => ({
+    const history = messages.filter(m => m.role === "user" || (m.role === "assistant" && m.text)).slice(-8).map(m => ({
       role: m.role,
-      content: m.role === "user" ? m.text : (m.text || m.card?.title || ""),
+      content: m.role === "user" ? m.text : (m.text || (m.card ? "[Showed visual tip: " + m.card.title + "]" : "")),
     }));
+
+    // Detect if this is likely a driving technique question
+    const isDrivingQ = /how to|how do i|tips? for|reduce|improve|brak|follow|distance|speed|turn|lane|scan|ahead|score|屯門|屯门|tuen mun|castle peak|煞車|刹车|車距|车距|超速|轉彎|转弯|怎麼|怎么|怎樣|怎样|如何|點樣|点样/i.test(msg);
 
     try {
       const res = await fetch("/api/chat", {
@@ -918,30 +960,38 @@ function DrivePage({ t, lang }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-sonnet-4-5",
-          max_tokens: 600,
-          system: `You are a friendly AI driving coach for Hong Kong minibus driver Yeung Tai Man. Current safety score: 82/100, lost 80 points this week (mainly from hard braking and following too close). Routes: Tuen Mun Road, Castle Peak Road, Sham Tseng.
+          max_tokens: 800,
+          system: `You are a friendly, knowledgeable AI driving coach for Hong Kong minibus driver Yeung Tai Man (楊大文). You work for SafeDrive, an app that monitors driving behavior and awards safety points.
 
-You MUST respond with ONLY a JSON object (no markdown fences, no extra text, nothing else).
+DRIVER CONTEXT:
+- Safety score: 82/100
+- Lost 80 points this week (hard braking: -30, following distance: -20, speeding: -30)
+- Routes: Tuen Mun Road, Castle Peak Road, Sham Tseng
+- 12-day safe driving streak
+- Ranked #4 on weekly leaderboard (420/500 pts), #6 on monthly
+- Can redeem points for fuel vouchers, meal coupons, phone top-ups
 
-Decide mode based on THIS user message:
+YOUR PERSONALITY:
+- Warm, encouraging, conversational — like a trusted colleague, not a robot
+- You genuinely care about driver safety and wellbeing
+- You can discuss anything: driving, the app, rewards, weather, life in Hong Kong, the job
+- You use the driver's data naturally in conversation when relevant
+- Keep responses concise (2-5 sentences for chat, can be longer for detailed advice)
+- Match the user's language (English, 繁體中文, or 简体中文)
+- Use emoji sparingly and naturally 😊
 
-MODE A - VISUAL CARD: ONLY when the user EXPLICITLY asks about a driving technique (how to brake, how to follow, route tips, how to improve score). If in doubt, use MODE B.
-{"mode":"card","title":"2-4 words","icon":"emoji","color":"orange|red|green|blue","visual":"distance|speed|brake|turn|score|lane|scan","tips":["tip1 ≤8 words","tip2 ≤8 words","tip3 ≤8 words"],"encouragement":"≤10 words"}
+RESPOND AS PLAIN TEXT — just write your reply naturally, like a human would in a chat app. No JSON, no special formatting.
 
-MODE B - PLAIN TEXT: For EVERYTHING else — greetings ("hi","hello","bye"), thanks ("thank you","thanks","good thanks"), compliments ("you are great"), chitchat, questions about app features, rewards, leaderboard info, unclear messages.
-{"mode":"text","text":"Your warm natural reply in 1-2 short sentences."}
+The ONLY exception: if the user asks a specific driving technique question (like "how to brake smoothly" or "tips for Tuen Mun Road"), then AFTER your conversational reply, add a line break and then add a JSON block on a new line starting with |||CARD||| like this:
 
-CRITICAL RULES:
-- "hi" / "hello" / "bye" / "thanks" / "good thanks" / "ok" / compliments → ALWAYS MODE B
-- Only use MODE A if user clearly asks "how to..." about driving
-- Match user's language (English / 繁體中文 / 简体中文)
-- Return ONLY the raw JSON object, no code fences, no explanation
+Your conversational reply here...
 
-Examples:
-User: "hi" → {"mode":"text","text":"Hi! How can I help with your driving today?"}
-User: "bye" → {"mode":"text","text":"Bye! Drive safe out there! 👋"}
-User: "good thanks!" → {"mode":"text","text":"You're welcome! Anytime you need tips, I'm here. 😊"}
-User: "how to reduce hard braking?" → {"mode":"card","title":"Smooth Braking","icon":"🛑","color":"red","visual":"brake","tips":["Scan 200m ahead","Lift gas before corners","Keep 3-second gap"],"encouragement":"Small changes, big score boost!"}`,
+|||CARD|||{"title":"2-4 words","icon":"emoji","color":"orange","visual":"brake","tips":["tip1","tip2","tip3"],"encouragement":"short phrase"}
+
+The "visual" field must be one of: distance, speed, brake, turn, score, lane, scan
+The "color" field must be one of: orange, red, green, blue
+
+For most messages (greetings, thanks, chitchat, questions about the app, compliments, etc.) — just reply naturally with NO card. Cards are ONLY for driving technique advice.`,
           messages: [...history, { role: "user", content: msg }],
         }),
       });
@@ -949,39 +999,68 @@ User: "how to reduce hard braking?" → {"mode":"card","title":"Smooth Braking",
 
       // Check for API error
       if (data.error) {
-        setMessages((p) => [...p, { role: "assistant", text: "AI error: " + (data.error.message || data.error) }]);
+        setMessages((p) => [...p, { role: "assistant", text: "AI service error: " + (data.error.message || JSON.stringify(data.error)) }]);
         setChatLoading(false);
         return;
       }
 
-      const reply = (data.content && data.content.map((c) => c.text || "").join("")) || "";
-      // Try to extract JSON (handle possible code fences)
-      let cleanReply = reply.trim();
-      cleanReply = cleanReply.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
-      const jsonMatch = cleanReply.match(/\{[\s\S]*\}/);
+      let reply = (data.content && data.content.map((c) => c.text || "").join("")) || "";
+      reply = reply.trim();
 
-      if (jsonMatch) {
+      if (!reply) {
+        setMessages((p) => [...p, { role: "assistant", text: "Sorry, I didn't get a response. Try again." }]);
+        setChatLoading(false);
+        return;
+      }
+
+      // Check if reply contains a visual card
+      const cardSplit = reply.split("|||CARD|||");
+      if (cardSplit.length > 1) {
+        // Has both text and card
+        const textPart = cardSplit[0].trim();
+        const cardPart = cardSplit[1].trim();
+
+        // Add the text message
+        if (textPart) {
+          setMessages((p) => [...p, { role: "assistant", text: textPart }]);
+        }
+
+        // Try to parse and add the card
         try {
-          const parsed = JSON.parse(jsonMatch[0]);
-          if (parsed.mode === "text" && parsed.text) {
-            setMessages((p) => [...p, { role: "assistant", text: parsed.text }]);
-          } else if (parsed.mode === "card" && parsed.tips) {
-            setMessages((p) => [...p, { role: "assistant", card: parsed }]);
-          } else if (parsed.text) {
-            setMessages((p) => [...p, { role: "assistant", text: parsed.text }]);
-          } else if (parsed.tips) {
-            setMessages((p) => [...p, { role: "assistant", card: parsed }]);
-          } else {
-            // Unexpected structure - just show raw reply as text
-            setMessages((p) => [...p, { role: "assistant", text: reply }]);
+          const cleanCard = cardPart.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+          const jsonMatch = cleanCard.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const card = JSON.parse(jsonMatch[0]);
+            if (card.tips) {
+              setMessages((p) => [...p, { role: "assistant", card }]);
+            }
           }
         } catch {
-          // Parse failed - show raw reply as text
-          setMessages((p) => [...p, { role: "assistant", text: reply }]);
+          // Card parse failed, that's fine — the text reply was already shown
         }
       } else {
-        // No JSON - show as plain text
-        setMessages((p) => [...p, { role: "assistant", text: reply || "Sorry, I didn't get that. Try again." }]);
+        // Plain text reply — just show it naturally
+        // But first strip any accidental JSON the AI might have returned
+        let cleanReply = reply.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+        const jsonMatch = cleanReply.match(/^\s*\{[\s\S]*\}\s*$/);
+        if (jsonMatch) {
+          // AI returned pure JSON despite instructions — try to extract text
+          try {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (parsed.text) {
+              setMessages((p) => [...p, { role: "assistant", text: parsed.text }]);
+            } else if (parsed.tips) {
+              setMessages((p) => [...p, { role: "assistant", card: parsed }]);
+            } else {
+              setMessages((p) => [...p, { role: "assistant", text: reply }]);
+            }
+          } catch {
+            setMessages((p) => [...p, { role: "assistant", text: reply }]);
+          }
+        } else {
+          // Normal text reply — perfect!
+          setMessages((p) => [...p, { role: "assistant", text: reply }]);
+        }
       }
     } catch (err) {
       setMessages((p) => [...p, { role: "assistant", text: "Connection error. Please check your network and try again." }]);
@@ -1176,7 +1255,7 @@ User: "how to reduce hard braking?" → {"mode":"card","title":"Smooth Braking",
   }
 
   if (mode === "done") {
-    const totalLost = 420 - pts;
+    const totalChange = pts - tripScore;
     const badCount = events.filter((e) => e.pts < 0).length;
     const goodCount = events.filter((e) => e.type === "good").length;
     const nearCount = events.filter((e) => e.type === "near").length;
@@ -1188,13 +1267,13 @@ User: "how to reduce hard braking?" → {"mode":"card","title":"Smooth Braking",
           <div style={{ background: "linear-gradient(135deg, " + ORANGE + ", " + ORANGE2 + ")", borderRadius: 22, padding: 22, color: "#fff", marginBottom: 16, textAlign: "center" }}>
             <div style={{ fontSize: 14, opacity: 0.85 }}>{t.ptsKept}</div>
             <div style={{ fontSize: 52, fontWeight: 800, margin: "4px 0" }}>{pts}</div>
-            <div style={{ fontSize: 14, opacity: 0.75 }}>{t.of} 420</div>
+            <div style={{ fontSize: 14, opacity: 0.75 }}>{t.of} {tripScore}</div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
             {[
               [t.duration, Math.floor(elapsed / 60) + ":" + (elapsed % 60).toString().padStart(2, "0"), "#333"],
               [t.dist, (elapsed * 0.012).toFixed(1) + " km", "#333"],
-              [t.ptsLost, "-" + totalLost, RED],
+              ["Net change", (totalChange >= 0 ? "+" : "") + totalChange, totalChange >= 0 ? GREEN : RED],
               [t.safeEv, goodCount, GREEN],
               [t.dangerEv, badCount, RED],
               [t.nearEv, nearCount, "#B45309"],
@@ -1209,12 +1288,12 @@ User: "how to reduce hard braking?" → {"mode":"card","title":"Smooth Braking",
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0", borderBottom: "1px solid " + BORDER }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: e.type === "bad" ? RED : e.type === "warn" ? ORANGE : e.type === "near" ? "#B45309" : GREEN }} />
               <div style={{ flex: 1, fontSize: 13, color: "#555" }}>{e.text}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: e.pts < 0 ? RED : e.type === "near" ? "#B45309" : GREEN }}>
-                {e.pts < 0 ? e.pts : e.type === "near" ? "close!" : "safe"}
+              <div style={{ fontSize: 13, fontWeight: 700, color: e.pts < 0 ? RED : e.pts > 0 ? GREEN : "#B45309" }}>
+                {e.pts > 0 ? "+" + e.pts : e.pts < 0 ? e.pts : "close!"}
               </div>
             </div>
           ))}
-          <button onClick={() => { setMode("idle"); setEvents([]); setElapsed(0); setPts(420); setSpeed(0); }} style={{ background: ORANGE, color: "#fff", border: "none", borderRadius: 28, padding: "16px", fontSize: 16, fontWeight: 700, cursor: "pointer", width: "100%", marginTop: 16 }}>
+          <button onClick={() => { setMode("idle"); setEvents([]); setElapsed(0); setSpeed(0); }} style={{ background: ORANGE, color: "#fff", border: "none", borderRadius: 28, padding: "16px", fontSize: 16, fontWeight: 700, cursor: "pointer", width: "100%", marginTop: 16 }}>
             {t.goBack}
           </button>
         </div>
@@ -1275,7 +1354,7 @@ User: "how to reduce hard braking?" → {"mode":"card","title":"Smooth Braking",
               </div>
             </div>
           ))}
-          <button onClick={() => setMode("done")} style={{ background: RED, color: "#fff", border: "none", borderRadius: 28, padding: "16px", fontSize: 16, fontWeight: 700, cursor: "pointer", width: "100%", marginTop: 16 }}>
+          <button onClick={() => { setMode("done"); if (onTripComplete) onTripComplete(pts); }} style={{ background: RED, color: "#fff", border: "none", borderRadius: 28, padding: "16px", fontSize: 16, fontWeight: 700, cursor: "pointer", width: "100%", marginTop: 16 }}>
             {t.endTrip}
           </button>
         </div>
@@ -1293,7 +1372,7 @@ User: "how to reduce hard braking?" → {"mode":"card","title":"Smooth Braking",
 
         <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
           <div style={{ flex: 1, background: BG, borderRadius: 16, padding: 16, textAlign: "center", border: "1px solid " + BORDER }}>
-            <div style={{ fontSize: 24, fontWeight: 800, color: ORANGE }}>420</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: ORANGE }}>{pts}</div>
             <div style={{ fontSize: 11, color: GRAY }}>{t.safetyPts}</div>
           </div>
           <div style={{ flex: 1, background: BG, borderRadius: 16, padding: 16, textAlign: "center", border: "1px solid " + BORDER }}>
@@ -1302,7 +1381,7 @@ User: "how to reduce hard braking?" → {"mode":"card","title":"Smooth Braking",
           </div>
         </div>
 
-        <button onClick={() => { setMode("driving"); setEvents([]); setElapsed(0); setPts(420); setSpeed(0); }} style={{ background: ORANGE, color: "#fff", border: "none", borderRadius: 28, padding: "16px", fontSize: 16, fontWeight: 700, cursor: "pointer", width: "100%", marginBottom: 12 }}>
+        <button onClick={() => { setMode("driving"); setEvents([]); setElapsed(0); setSpeed(0); }} style={{ background: ORANGE, color: "#fff", border: "none", borderRadius: 28, padding: "16px", fontSize: 16, fontWeight: 700, cursor: "pointer", width: "100%", marginBottom: 12 }}>
           {t.startTrip}
         </button>
         <button onClick={() => setMode("chat")} style={{ background: "#fff", color: ORANGE, border: "2px solid " + ORANGE, borderRadius: 28, padding: "14px", fontSize: 15, fontWeight: 700, cursor: "pointer", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
@@ -1313,14 +1392,112 @@ User: "how to reduce hard braking?" → {"mode":"card","title":"Smooth Braking",
   );
 }
 
-function RankPage({ t }) {
+function RankPage({ t, tripCompleted, tripScore, prevTripScore, rankAnimShown, setRankAnimShown, prevWeeklyRank, setPrevWeeklyRank }) {
   const [period, setPeriod] = useState("weekly");
-  const list = period === "weekly" ? DRIVERS_WEEKLY : DRIVERS_MONTHLY;
+  const [showNewRanks, setShowNewRanks] = useState(rankAnimShown[period] || false);
+  const [animHighlight, setAnimHighlight] = useState(false);
+
+  // Dynamic post-trip lists using actual tripScore (weekly only)
+  const weeklyPost = DRIVERS_WEEKLY_POST.map(d => d.me ? { ...d, pts: tripScore || 482 } : d)
+    .sort((a, b) => b.pts - a.pts);
+
+  // "Old" weekly list uses prevTripScore (the score BEFORE this trip)
+  const weeklyOld = DRIVERS_WEEKLY.map(d => d.me ? { ...d, pts: prevTripScore } : d)
+    .sort((a, b) => b.pts - a.pts);
+
+  const playSwoosh = () => {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      const ctx = new AC();
+      const now = ctx.currentTime;
+      // Smooth swoosh: filtered noise sweep upward
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(200, now);
+      osc.frequency.exponentialRampToValueAtTime(800, now + 0.3);
+      osc.frequency.exponentialRampToValueAtTime(1400, now + 0.5);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.linearRampToValueAtTime(0.15, now + 0.25);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+      // Low-pass filter for smoothness
+      const filter = ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(600, now);
+      filter.frequency.exponentialRampToValueAtTime(3000, now + 0.4);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.6);
+      // Chime at end
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = "sine";
+      osc2.frequency.value = 1318;
+      gain2.gain.setValueAtTime(0, now + 0.45);
+      gain2.gain.linearRampToValueAtTime(0.2, now + 0.5);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.45);
+      osc2.stop(now + 1.0);
+      setTimeout(() => { try { ctx.close(); } catch(e) {} }, 1500);
+    } catch(e) {}
+  };
+
+  useEffect(() => {
+    if (period !== "weekly") {
+      if (tripCompleted && rankAnimShown.weekly) {
+        setShowNewRanks(false);
+      }
+      setAnimHighlight(false);
+      return;
+    }
+    if (tripCompleted && !rankAnimShown[period]) {
+      setShowNewRanks(false);
+      setAnimHighlight(false);
+      // Mark as done IMMEDIATELY so it never replays
+      setRankAnimShown(prev => ({ ...prev, [period]: true }));
+      const t1 = setTimeout(() => {
+        playSwoosh();
+        setShowNewRanks(true);
+        setAnimHighlight(true);
+      }, 1000);
+      const t2 = setTimeout(() => {
+        setAnimHighlight(false);
+      }, 3000);
+      return () => { clearTimeout(t1); clearTimeout(t2); };
+    }
+    if (tripCompleted && rankAnimShown[period]) {
+      setShowNewRanks(true);
+      setAnimHighlight(false);
+    }
+  }, [tripCompleted, period]);
+
+  const usePost = tripCompleted && showNewRanks && period === "weekly";
+  const list = period === "weekly"
+    ? (usePost ? weeklyPost : weeklyOld)
+    : DRIVERS_MONTHLY;
+
   const myIdx = list.findIndex((d) => d.me);
   const myRank = myIdx + 1;
 
+  // Old rank derived from the pre-trip weekly list
+  const oldMyIdx = weeklyOld.findIndex(d => d.me);
+  const oldRank = oldMyIdx + 1;
+  const rankChanged = usePost && period === "weekly" && myRank !== oldRank;
+  const rankUp = usePost && period === "weekly" && myRank < oldRank;
+
+  // Save new rank once animation is done
+  useEffect(() => {
+    if (usePost && period === "weekly" && rankAnimShown.weekly) {
+      setPrevWeeklyRank(myRank);
+    }
+  }, [usePost, myRank, rankAnimShown.weekly]);
+
   const MedalIcon = ({ type }) => {
-    // type: 'gold' 'silver' 'bronze'
     const colors = {
       gold: { ribbon: "#E8601C", ribbon2: "#F4A259", medal: "#FFD700", medalDark: "#B8860B", border: "#DAA520" },
       silver: { ribbon: "#5AC8FA", ribbon2: "#87CEEB", medal: "#E5E5E5", medalDark: "#A8A8A8", border: "#C0C0C0" },
@@ -1329,13 +1506,10 @@ function RankPage({ t }) {
     const c = colors[type];
     return (
       <svg width="32" height="36" viewBox="0 0 32 36" fill="none">
-        {/* Ribbon */}
         <path d="M8 0 L6 12 L11 10 L16 14 L21 10 L26 12 L24 0 Z" fill={c.ribbon} />
         <path d="M8 0 L11 10 L16 14 L21 10 L24 0 L20 0 L16 10 L12 0 Z" fill={c.ribbon2} opacity="0.5" />
-        {/* Medal circle */}
         <circle cx="16" cy="24" r="10" fill={c.medal} stroke={c.border} strokeWidth="1.5" />
         <circle cx="16" cy="24" r="7" fill="none" stroke={c.medalDark} strokeWidth="0.5" opacity="0.5" />
-        {/* Number or star */}
         <text x="16" y="28" fontSize="10" fontWeight="800" fill={c.medalDark} textAnchor="middle">
           {type === "gold" ? "1" : type === "silver" ? "2" : "3"}
         </text>
@@ -1356,7 +1530,6 @@ function RankPage({ t }) {
       <div style={{ padding: "0 20px 100px" }}>
         <div style={{ fontSize: 26, fontWeight: 800, color: "#222", margin: "8px 0 16px" }}>{t.board}</div>
 
-        {/* Toggle */}
         <div style={{ display: "flex", background: "#f5f5f5", borderRadius: 14, padding: 3, marginBottom: 14 }}>
           {[["weekly", t.weekly], ["monthly", t.monthly]].map((p) => (
             <div key={p[0]} onClick={() => setPeriod(p[0])} style={{ flex: 1, padding: 10, borderRadius: 11, textAlign: "center", fontSize: 14, fontWeight: 600, cursor: "pointer", background: period === p[0] ? ORANGE : "transparent", color: period === p[0] ? "#fff" : GRAY, transition: "all 0.2s" }}>
@@ -1365,7 +1538,6 @@ function RankPage({ t }) {
           ))}
         </div>
 
-        {/* User rank banner */}
         <div style={{ background: "linear-gradient(135deg, " + ORANGE + ", " + ORANGE2 + ")", borderRadius: 18, padding: "14px 18px", color: "#fff", marginBottom: 14, display: "flex", alignItems: "center", gap: 14 }}>
           <div style={{ width: 54, height: 54, borderRadius: "50%", background: "rgba(255,255,255,0.22)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", flexShrink: 0 }}>
             <div style={{ fontSize: 10, opacity: 0.85, lineHeight: 1 }}>#</div>
@@ -1376,10 +1548,11 @@ function RankPage({ t }) {
             <div style={{ fontSize: 16, fontWeight: 700 }}>
               {period === "weekly" ? `You're #${myRank} this week` : `You're #${myRank} this month`}
             </div>
-            <div style={{ fontSize: 11, opacity: 0.85, marginTop: 2 }}>
-              {list[myIdx].pts.toLocaleString()} {t.pts}
-              {myIdx > 0 && ` · ${(list[myIdx - 1].pts - list[myIdx].pts)} ${t.pts} to #${myIdx}`}
-            </div>
+            {rankChanged && (
+              <div style={{ fontSize: 12, marginTop: 4, background: "rgba(255,255,255,0.25)", borderRadius: 8, padding: "2px 10px", display: "inline-block" }}>
+                {rankUp ? "⬆️" : "⬇️"} #{oldRank} → #{myRank}
+              </div>
+            )}
           </div>
         </div>
 
@@ -1387,8 +1560,16 @@ function RankPage({ t }) {
 
         {list.map((d, i) => {
           const medal = getMedal(i);
+          const isAnimating = d.me && animHighlight;
           return (
-            <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 10px", marginBottom: 6, borderRadius: 14, background: d.me ? ORANGE_LIGHT : "transparent", border: d.me ? "1.5px solid #FDDDD0" : "1.5px solid transparent" }}>
+            <div key={d.id} style={{
+              display: "flex", alignItems: "center", gap: 10, padding: "12px 10px", marginBottom: 6, borderRadius: 14,
+              background: d.me ? ORANGE_LIGHT : "transparent",
+              border: d.me ? "1.5px solid #FDDDD0" : "1.5px solid transparent",
+              animation: isAnimating ? "rankSlideUp 0.6s ease-out, rankGlow 1.5s ease-in-out" : "none",
+              boxShadow: isAnimating ? "0 0 20px rgba(232,96,28,0.3)" : "none",
+              transition: "all 0.3s",
+            }}>
               <div style={{ width: 36, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {medal ? (
                   <MedalIcon type={medal} />
@@ -1397,7 +1578,12 @@ function RankPage({ t }) {
                 )}
               </div>
               <div style={{ width: 36, height: 36, borderRadius: "50%", background: d.me ? ORANGE : "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, color: d.me ? "#fff" : GRAY, flexShrink: 0 }}>{d.ini}</div>
-              <div style={{ flex: 1, fontSize: 14, fontWeight: d.me ? 700 : 500, color: d.me ? ORANGE : "#333" }}>{d.me ? "You" : d.name}</div>
+              <div style={{ flex: 1, fontSize: 14, fontWeight: d.me ? 700 : 500, color: d.me ? ORANGE : "#333" }}>
+                {d.me ? "You" : d.name}
+                {d.me && rankChanged && animHighlight && (
+                  <span style={{ fontSize: 11, color: rankUp ? GREEN : RED, marginLeft: 6 }}>{rankUp ? "▲" : "▼"} {Math.abs(oldRank - myRank)}</span>
+                )}
+              </div>
               <div style={{ fontSize: 15, fontWeight: 700, color: ORANGE }}>
                 {d.pts.toLocaleString()} <span style={{ fontSize: 10, fontWeight: 400, color: GRAY }}>{t.pts}</span>
               </div>
@@ -1405,15 +1591,69 @@ function RankPage({ t }) {
           );
         })}
       </div>
+      <style>{`
+        @keyframes rankSlideUp {
+          0% { transform: translateY(30px); opacity: 0.3; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes rankGlow {
+          0% { box-shadow: 0 0 0 rgba(232,96,28,0); }
+          50% { box-shadow: 0 0 24px rgba(232,96,28,0.4); }
+          100% { box-shadow: 0 0 0 rgba(232,96,28,0); }
+        }
+      `}</style>
     </div>
   );
 }
 
-function RewardsPage({ t }) {
-  const [balance, setBalance] = useState(1840);
-  const [redeemed, setRedeemed] = useState([]);
+function RewardsPage({ t, balance, setBalance, redeemed, setRedeemed }) {
+
+  const playPaymentSound = () => {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      const ctx = new AC();
+      const now = ctx.currentTime;
+
+      const ping = (startTime, freq, dur) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now + startTime);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + startTime + dur * 0.3);
+        gain.gain.setValueAtTime(0.3, now + startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + startTime + dur);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + startTime);
+        osc.stop(now + startTime + dur);
+      };
+
+      const shimmer = (startTime, freq, dur) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "triangle";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.15, now + startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + startTime + dur);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + startTime);
+        osc.stop(now + startTime + dur);
+      };
+
+      ping(0, 1800, 0.15);
+      ping(0.08, 2400, 0.12);
+      shimmer(0.05, 4000, 0.2);
+      shimmer(0.12, 5200, 0.15);
+
+      setTimeout(() => { try { ctx.close(); } catch(e) {} }, 500);
+    } catch (e) {}
+  };
+
   const redeem = (r) => {
     if (balance >= r.cost && !redeemed.includes(r.id)) {
+      playPaymentSound();
       setBalance((b) => b - r.cost);
       setRedeemed((p) => [...p, r.id]);
     }
@@ -1853,6 +2093,13 @@ export default function App() {
   const [lang, setLang] = useState("en");
   const [notif, setNotif] = useState({});
   const [showLoss, setShowLoss] = useState(true);
+  const [rewardBalance, setRewardBalance] = useState(1840);
+  const [redeemedItems, setRedeemedItems] = useState([]);
+  const [tripCompleted, setTripCompleted] = useState(false);
+  const [tripScore, setTripScore] = useState(420);
+  const [prevTripScore, setPrevTripScore] = useState(420);
+  const [rankAnimShown, setRankAnimShown] = useState({ weekly: false, monthly: false });
+  const [prevWeeklyRank, setPrevWeeklyRank] = useState(4);
 
   const t = TEXTS[lang] || TEXTS.en;
 
@@ -1875,8 +2122,8 @@ export default function App() {
 
   // Phone frame with 8.2:16.15 aspect ratio
   const phoneFrame = {
-    width: "min(430px, calc((100vh - 40px) * 8.2 / 16.15))",
-    aspectRatio: "8.2 / 16.15",
+    width: "min(430px, calc((100vh - 40px) * 8.17 / 15.7))",
+    aspectRatio: "8.17 / 15.7",
     background: "#1a1a1a",
     borderRadius: 48,
     padding: 12,
@@ -1903,14 +2150,14 @@ export default function App() {
     background: "#fff",
   };
 
-  // Dynamic island / notch at top, spaced ~5mm from frame edge
+  // Dynamic island / notch
   const notch = {
     position: "absolute",
-    top: 24,
+    top: 19.5,
     left: "50%",
     transform: "translateX(-50%)",
-    width: 110,
-    height: 28,
+    width: 120,
+    height: 34,
     background: "#000",
     borderRadius: 20,
     zIndex: 200,
@@ -1937,10 +2184,10 @@ export default function App() {
         <div style={notch} />
         <div style={phoneScreen}>
           <div style={scrollArea}>
-            {tab === "home" && <HomePage t={t} showLoss={showLoss} />}
-            {tab === "drive" && <DrivePage t={t} lang={lang} />}
-            {tab === "rank" && <RankPage t={t} />}
-            {tab === "rewards" && <RewardsPage t={t} />}
+            {tab === "home" && <HomePage t={t} showLoss={showLoss} tripScore={tripScore} />}
+            {tab === "drive" && <DrivePage t={t} lang={lang} tripScore={tripScore} onTripComplete={(score) => { setPrevTripScore(tripScore); setTripCompleted(true); setTripScore(score); setRankAnimShown({ weekly: false, monthly: false }); }} />}
+            {tab === "rank" && <RankPage t={t} tripCompleted={tripCompleted} tripScore={tripScore} prevTripScore={prevTripScore} rankAnimShown={rankAnimShown} setRankAnimShown={setRankAnimShown} prevWeeklyRank={prevWeeklyRank} setPrevWeeklyRank={setPrevWeeklyRank} />}
+            {tab === "rewards" && <RewardsPage t={t} balance={rewardBalance} setBalance={setRewardBalance} redeemed={redeemedItems} setRedeemed={setRedeemedItems} />}
             {tab === "me" && (
               <MePage t={t} lang={lang} setLang={setLang} notif={notif} setNotif={setNotif} showLoss={showLoss} setShowLoss={setShowLoss} />
             )}
@@ -1951,4 +2198,3 @@ export default function App() {
     </div>
   );
 }
- 
