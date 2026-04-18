@@ -257,7 +257,7 @@ function StatusBar() {
 function TabBar({ active, setTab, t }) {
   const tabs = [
     { key: "home", icon: "🏠", label: t.home },
-    { key: "drive", icon: "🚐", label: t.drive },
+    { key: "drive", icon: "🚍", label: t.drive },
     { key: "rank", icon: "🏅", label: t.rank },
     { key: "rewards", icon: "🎁", label: t.rewards },
     { key: "me", icon: "👤", label: t.me },
@@ -516,7 +516,7 @@ function GoogleStyleMap({ progress = null, height = 200 }) {
       {progress !== null && (
         <div style={{ position: "absolute", top: 10, left: 10, display: "flex", gap: 6 }}>
           <div style={{ background: "#fff", borderRadius: 8, padding: "5px 10px", fontSize: 11, fontWeight: 600, color: "#333", boxShadow: "0 1px 3px rgba(0,0,0,0.15)" }}>
-            🚐 {(pct * 18.5).toFixed(1)} km
+            🚍 {(pct * 18.5).toFixed(1)} km
           </div>
           <div style={{ background: "#fff", borderRadius: 8, padding: "5px 10px", fontSize: 11, fontWeight: 600, color: "#1E6CD8", boxShadow: "0 1px 3px rgba(0,0,0,0.15)" }}>
             ETA {Math.max(0, Math.round((1 - pct) * 25))} min
@@ -545,7 +545,7 @@ function LoginPage({ onLogin }) {
   if (step === 0) {
     return (
       <div style={{ minHeight: "100%", background: "linear-gradient(160deg, " + ORANGE + " 0%, " + ORANGE2 + " 50%, #FFD19A 100%)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: 40 }}>
-        <div style={{ width: 100, height: 100, borderRadius: 28, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 52, marginBottom: 20 }}>🚐</div>
+        <div style={{ width: 100, height: 100, borderRadius: 28, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 52, marginBottom: 20 }}>🚍</div>
         <div style={{ fontSize: 36, fontWeight: 800, color: "#fff", marginBottom: 6 }}>SafeDrive</div>
         <div style={{ fontSize: 15, color: "rgba(255,255,255,0.85)", marginBottom: 40, textAlign: "center", lineHeight: 1.5 }}>
           Smart safety companion for<br />Hong Kong minibus drivers
@@ -937,6 +937,40 @@ function DrivePage({ t, lang, onTripComplete, tripScore }) {
     return () => clearInterval(intervalRef.current);
   }, [mode]);
 
+  const playMessageSound = () => {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      const ctx = new AC();
+      const now = ctx.currentTime;
+      // Short soft "pop" like iMessage receive
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(1100, now);
+      osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.15);
+      // Subtle second tap
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = "sine";
+      osc2.frequency.value = 1400;
+      gain2.gain.setValueAtTime(0, now + 0.06);
+      gain2.gain.linearRampToValueAtTime(0.1, now + 0.08);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.06);
+      osc2.stop(now + 0.18);
+      setTimeout(() => { try { ctx.close(); } catch(e) {} }, 300);
+    } catch(e) {}
+  };
+
   const sendChat = async (overrideText) => {
     const raw = overrideText !== undefined ? overrideText : chatInput;
     if (!raw || !raw.trim()) return;
@@ -1062,6 +1096,7 @@ For most messages (greetings, thanks, chitchat, questions about the app, complim
           setMessages((p) => [...p, { role: "assistant", text: reply }]);
         }
       }
+      playMessageSound();
     } catch (err) {
       setMessages((p) => [...p, { role: "assistant", text: "Connection error. Please check your network and try again." }]);
     }
