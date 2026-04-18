@@ -1718,7 +1718,7 @@ function RewardsPage({ t, balance, setBalance, redeemed, setRedeemed }) {
 }
 
 // Call screen overlay
-function CallScreen({ contact, number, color, onEnd, t }) {
+function CallScreen({ contact, number, color, icon, onEnd, t }) {
   const [state, setState] = useState("calling");
   const [seconds, setSeconds] = useState(0);
   const [muted, setMuted] = useState(false);
@@ -1831,59 +1831,82 @@ function CallScreen({ contact, number, color, onEnd, t }) {
   );
 
   return (
-    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "linear-gradient(180deg, #2C3E50 0%, #1a252f 100%)", zIndex: 200, display: "flex", flexDirection: "column", alignItems: "center", padding: "50px 30px 30px" }}>
-      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 4, letterSpacing: 0.5 }}>
-        {state === "calling" ? t.calling : t.connected}
+    <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "#fff", zIndex: 200, display: "flex", flexDirection: "column" }}>
+      <StatusBar />
+      {/* Back button */}
+      <div onClick={onEnd} style={{ padding: "8px 20px", cursor: "pointer" }}>
+        <span style={{ fontSize: 18, color: "#333" }}>‹ Back</span>
       </div>
-      <div style={{ fontSize: 28, fontWeight: 300, color: "#fff", marginBottom: 4, textAlign: "center" }}>{contact}</div>
-      <div style={{ fontSize: 15, color: "rgba(255,255,255,0.65)" }}>{number}</div>
-      {state === "connected" && (
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", marginTop: 6, fontVariantNumeric: "tabular-nums" }}>{mm}:{ss}</div>
-      )}
 
-      {/* Avatar circle with pulse */}
-      <div style={{ position: "relative", margin: "40px 0 30px" }}>
-        {state === "calling" && (
-          <>
-            <div style={{ position: "absolute", inset: -20, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", animation: "callPulse 2s infinite" }} />
-            <div style={{ position: "absolute", inset: -20, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.2)", animation: "callPulse 2s infinite 0.5s" }} />
-            <div style={{ position: "absolute", inset: -20, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.15)", animation: "callPulse 2s infinite 1s" }} />
-          </>
+      {/* Center content */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", paddingBottom: 60 }}>
+        {/* Avatar */}
+        <div style={{ position: "relative", marginBottom: 20 }}>
+          {state === "calling" && (
+            <>
+              <div style={{ position: "absolute", inset: -15, borderRadius: "50%", border: "2px solid " + color, opacity: 0.3, animation: "callPulse 2s infinite" }} />
+              <div style={{ position: "absolute", inset: -15, borderRadius: "50%", border: "2px solid " + color, opacity: 0.2, animation: "callPulse 2s infinite 0.6s" }} />
+            </>
+          )}
+          <div style={{ width: 100, height: 100, borderRadius: "50%", border: "3px solid " + color, background: "#EBF5FB", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", fontSize: 48 }}>
+            {icon || "📞"}
+          </div>
+        </div>
+
+        {/* Name */}
+        <div style={{ fontSize: 26, fontWeight: 500, color: "#222", marginBottom: 6, textAlign: "center" }}>{contact}</div>
+
+        {/* Status */}
+        {state === "calling" ? (
+          <div style={{ fontSize: 15, color: GRAY }}>Calling....</div>
+        ) : (
+          <div style={{ fontSize: 28, fontWeight: 300, color: "#222", fontVariantNumeric: "tabular-nums" }}>{mm}:{ss}</div>
         )}
-        <div style={{ width: 120, height: 120, borderRadius: "50%", background: color, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.3)", position: "relative" }}>
-          <PhoneIcon size={50} color="#fff" />
-        </div>
       </div>
 
-      <div style={{ flex: 1 }} />
+      {/* Bottom action buttons row */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 16, padding: "20px 30px 30px" }}>
+        {/* Camera */}
+        <div style={{ width: 52, height: 52, borderRadius: "50%", background: state === "connected" ? "#F4A259" : "#F0F0F0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M23 7l-7 5 7 5V7z" stroke={state === "connected" ? "#fff" : "#888"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke={state === "connected" ? "#fff" : "#888"} strokeWidth="2" fill="none" />
+          </svg>
+        </div>
 
-      {/* Action buttons */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 30, marginBottom: 36 }}>
-        <div style={{ textAlign: "center", cursor: "pointer" }} onClick={() => setMuted(!muted)}>
-          <div style={{ width: 60, height: 60, borderRadius: "50%", background: muted ? "#fff" : "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px", border: "1.5px solid rgba(255,255,255,0.25)", transition: "all 0.2s" }}>
-            <MuteIcon active={muted} />
-          </div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>{t.mute}</div>
+        {/* Mute */}
+        <div onClick={() => setMuted(!muted)} style={{ width: 52, height: 52, borderRadius: "50%", background: muted ? "#E74C3C" : (state === "connected" ? "#F4A259" : "#F0F0F0"), display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke={muted || state === "connected" ? "#fff" : "#888"} strokeWidth="2" fill="none" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke={muted || state === "connected" ? "#fff" : "#888"} strokeWidth="2" strokeLinecap="round" />
+            {muted && <line x1="4" y1="4" x2="20" y2="20" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" />}
+          </svg>
         </div>
-        <div style={{ textAlign: "center", cursor: "pointer" }}>
-          <div style={{ width: 60, height: 60, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px", border: "1.5px solid rgba(255,255,255,0.25)" }}>
-            <KeypadIcon />
-          </div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>{t.keypad}</div>
+
+        {/* Call / End call - center button, larger */}
+        <div onClick={state === "calling" ? undefined : onEnd} style={{ width: 62, height: 62, borderRadius: "50%", background: state === "calling" ? "#27AE60" : "#E74C3C", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 4px 16px " + (state === "calling" ? "rgba(39,174,96,0.4)" : "rgba(231,76,60,0.4)") }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style={{ transform: state === "connected" ? "rotate(135deg)" : "none" }}>
+            <path d="M22 16.92V20a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3.09a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="#fff" strokeWidth="2" fill="#fff" />
+          </svg>
         </div>
-        <div style={{ textAlign: "center", cursor: "pointer" }} onClick={() => setSpeaker(!speaker)}>
-          <div style={{ width: 60, height: 60, borderRadius: "50%", background: speaker ? "#fff" : "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px", border: "1.5px solid rgba(255,255,255,0.25)", transition: "all 0.2s" }}>
-            <SpeakerIcon active={speaker} />
-          </div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>{t.speaker}</div>
+
+        {/* Screen share */}
+        <div style={{ width: 52, height: 52, borderRadius: "50%", background: state === "connected" ? "#F4A259" : "#F0F0F0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="3" width="20" height="14" rx="2" stroke={state === "connected" ? "#fff" : "#888"} strokeWidth="2" fill="none" />
+            <path d="M8 21h8M12 17v4" stroke={state === "connected" ? "#fff" : "#888"} strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </div>
+
+        {/* More */}
+        <div style={{ width: 52, height: 52, borderRadius: "50%", background: state === "connected" ? "#F4A259" : "#F0F0F0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <circle cx="6" cy="12" r="2" fill={state === "connected" ? "#fff" : "#888"} />
+            <circle cx="12" cy="12" r="2" fill={state === "connected" ? "#fff" : "#888"} />
+            <circle cx="18" cy="12" r="2" fill={state === "connected" ? "#fff" : "#888"} />
+          </svg>
         </div>
       </div>
-
-      {/* End call button */}
-      <div onClick={onEnd} style={{ width: 66, height: 66, borderRadius: "50%", background: "#E74C3C", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 6px 24px rgba(231,76,60,0.5)" }}>
-        <PhoneIcon size={32} color="#fff" rotate={135} />
-      </div>
-      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 8 }}>{t.endCall}</div>
 
       <style>{`
         @keyframes callPulse {
@@ -1914,24 +1937,24 @@ function MePage({ t, lang, setLang, notif, setNotif, showLoss, setShowLoss }) {
             <div style={{ fontSize: 13, color: GRAY, marginTop: 6 }}>Tap to call</div>
           </div>
           {[
-            { label: t.emer + " (999)", number: "999", color: RED },
-            { label: t.police + " (999)", number: "999", color: "#333" },
-            { label: t.operator, number: "+852 2XXX XXXX", color: ORANGE },
+            { label: t.emer + " (999)", number: "999", color: RED, icon: "🚨" },
+            { label: t.police + " (999)", number: "999", color: "#333", icon: "👮🏻‍♂️" },
+            { label: t.operator, number: "+852 2XXX XXXX", color: "#27AE60", icon: "👨🏻‍🔧" },
           ].map((c, i) => (
-            <div key={i} onClick={() => setCall({ contact: c.label, number: c.number, color: c.color })} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 16, background: BG, borderRadius: 16, marginBottom: 8, border: "1px solid " + BORDER, cursor: "pointer" }}>
+            <div key={i} onClick={() => setCall({ contact: c.label, number: c.number, color: c.color, icon: c.icon })} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 16, background: BG, borderRadius: 16, marginBottom: 8, border: "1px solid " + BORDER, cursor: "pointer" }}>
               <div>
                 <div style={{ fontSize: 15, fontWeight: 600, color: "#333" }}>{c.label}</div>
                 <div style={{ fontSize: 13, color: GRAY }}>{c.number}</div>
               </div>
-              <div style={{ width: 48, height: 48, borderRadius: "50%", background: c.color, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                  <path d="M22 16.92V20a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3.09a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="#fff" />
+              <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#fff", border: "2.5px solid " + c.color, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M22 16.92V20a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3.09a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke={c.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                 </svg>
               </div>
             </div>
           ))}
         </div>
-        {call && <CallScreen contact={call.contact} number={call.number} color={call.color} onEnd={() => setCall(null)} t={t} />}
+        {call && <CallScreen contact={call.contact} number={call.number} color={call.color} icon={call.icon} onEnd={() => setCall(null)} t={t} />}
       </div>
     );
   }
